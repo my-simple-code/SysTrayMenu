@@ -1,6 +1,6 @@
 Build: dotnet build
 
-Run: SysTrayMenu.exe <folder>
+Run: SysTrayMenu.exe [folder]
 
 Description: View folder as a menu, accessed via the system tray.
 
