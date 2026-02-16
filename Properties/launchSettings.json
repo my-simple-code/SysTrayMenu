@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "SysTrayMenu": {
-      "commandName": "Project",
-      "commandLineArgs": "C:\\Tools\\CMD 22"
-    }
-  }
-}
