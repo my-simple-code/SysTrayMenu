@@ -13,18 +13,19 @@
                 menu.MouseHover += MouseHover;
             }
         }
-        internal static void SetMenuItems(ToolStripDropDownMenu? menuItem)
+
+        internal static void SetMenuItems(ToolStripDropDownMenu? menu)
         {
-            if (menuItem != null)
+            if (menu != null)
             {
-                DirectoryItem? fileItem = menuItem.Tag as DirectoryItem;
+                DirectoryItem? fileItem = menu.Tag as DirectoryItem;
                 if (fileItem != null)
                 {
-                    menuItem.Items.Clear();
-                    menuItem.Items.AddRange(DirectoryReader.GetDirectoryItems(fileItem.Path).Select(x => CreateMenuItem(x)).ToArray());
-                    if (menuItem.Items.Count == 0)
+                    menu.Items.Clear();
+                    menu.Items.AddRange(DirectoryReader.GetDirectoryItems(fileItem.Path).Select(x => CreateMenuItem(x)).ToArray());
+                    if (menu.Items.Count == 0)
                     {
-                        menuItem.Items.Add(new ToolStripMenuItem("Empty", null));
+                        menu.Items.Add(new ToolStripMenuItem("Empty", null));
                     }
                 }
             }
@@ -36,12 +37,14 @@
             var menuItem = new ToolStripMenuItem(directoryItem.Name, image);
             menuItem.Tag = directoryItem;
             menuItem.MouseDown += MenuItem_MouseDown;
+
             if (!directoryItem.IsFile)
             {
                 ConfigMenu(menuItem.DropDown as ToolStripDropDownMenu, directoryItem);
             }
             return menuItem;
         }
+
         internal static void SetForegroundTopParent(Control? control)
         {
             if (control != null)
@@ -56,8 +59,8 @@
 
         internal static void Opening(object? sender, System.ComponentModel.CancelEventArgs e)
         {
-            ToolStripDropDownMenu? clickedItem = sender as ToolStripDropDownMenu;
-            SetMenuItems(clickedItem);
+            ToolStripDropDownMenu? menu = sender as ToolStripDropDownMenu;
+            SetMenuItems(menu);
         }
 
         internal static void Closing(object? sender, ToolStripDropDownClosingEventArgs e)
@@ -84,7 +87,7 @@
                 {
                     if (e.Button == MouseButtons.Right)
                     {
-                        WinShell.ViewInExplorer(directoryItem.Path);
+                        WinShell.OpenInExplorer(directoryItem.Path);
                     }
                     else if (e.Button == MouseButtons.Left && directoryItem.IsFile)
                     {

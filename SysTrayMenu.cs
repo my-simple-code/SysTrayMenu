@@ -2,18 +2,19 @@ namespace SysTrayMenu
 {
     public class SysTrayMenu : ApplicationContext
     {
-        private DirectoryItem rootDirectoryItem;
-        private ContextMenuStrip mainMenu;
+        private string paramFolderPath = WinShell.DesktopFolder;
+        private StockIconId paramAppIconId = StockIconId.Folder;
+        private DirectoryItem mainDirectoryItem;
+        private ContextMenuStrip mainMenuStrip;
         private NotifyIcon trayIcon;
 
         public SysTrayMenu()
         {
-            var args = Environment.GetCommandLineArgs();
-            var rootPath = args.Length > 1 && Directory.Exists(args[1]) ? args[1] : WinShell.DesktopFolder;
-            rootDirectoryItem = DirectoryItem.Folder(rootPath);
+            ReadParameters();
+            mainDirectoryItem = DirectoryItem.Folder(paramFolderPath);
 
-            mainMenu = new ContextMenuStrip();
-            DynamicMenu.ConfigMenu(mainMenu, rootDirectoryItem);
+            mainMenuStrip = new ContextMenuStrip();
+            DynamicMenu.ConfigMenu(mainMenuStrip, mainDirectoryItem);
 
             trayIcon = new NotifyIcon();
             ConfigTrayIcon(trayIcon);
@@ -24,26 +25,40 @@ namespace SysTrayMenu
             trayIcon.Visible = true;
         }
 
+        private void ReadParameters()
+        {
+            var args = Environment.GetCommandLineArgs();
+            if (args.Length > 1 && Directory.Exists(args[1]))
+            {
+                paramFolderPath = args[1];
+            }
+
+            if (args.Length > 2 && int.TryParse(args[2], out _) && Enum.IsDefined(typeof(StockIconId), int.Parse(args[2])))
+            {
+                paramAppIconId = (StockIconId) int.Parse(args[2]);
+            }
+        }
+
         private void ConfigTrayIcon(NotifyIcon trayIcon)
         {
-            trayIcon.Text = rootDirectoryItem.Name;
-            trayIcon.Icon = WinShell.FolderIcon;
+            trayIcon.Text = mainDirectoryItem.Name;
+            trayIcon.Icon = SystemIcons.GetStockIcon(paramAppIconId);
             trayIcon.MouseClick += TrayIcon_MouseClick;
         }
 
         private void ConfigContextMenu(ContextMenuStrip contextMenu)
         {
-            if (rootDirectoryItem.Path != WinShell.DesktopFolder)
+            if (mainDirectoryItem.Path != WinShell.DesktopFolder)
             {
                 var directoryItem = DirectoryItem.Folder(WinShell.DesktopFolder);
-                var menuItem = new ToolStripMenuItem(directoryItem.Name, WinShell.FolderImage);
+                var menuItem = new ToolStripMenuItem(directoryItem.Name, SystemIcons.GetStockIcon(StockIconId.DesktopPC).ToBitmap());
                 DynamicMenu.ConfigMenu((ToolStripDropDownMenu) menuItem.DropDown, directoryItem);
 
                 contextMenu.Items.Add(menuItem);
-                contextMenu.Items.Add($"Open {rootDirectoryItem.Name}", null, (s, e) => WinShell.ViewInExplorer(rootDirectoryItem.Path));
+                contextMenu.Items.Add($"Open {mainDirectoryItem.Name} in Explorer", WinShell.FolderImage, (s, e) => WinShell.OpenInExplorer(mainDirectoryItem.Path));
             }
             
-            contextMenu.Items.Add(new ToolStripMenuItem("Exit", null, Exit));
+            contextMenu.Items.Add(new ToolStripMenuItem("Exit", SystemIcons.GetStockIcon(StockIconId.Delete).ToBitmap(), Exit));
         }
 
         private void Exit(object? sender, EventArgs e)
@@ -51,12 +66,13 @@ namespace SysTrayMenu
             trayIcon.Visible = false;
             Application.Exit();
         }
+
         private void TrayIcon_MouseClick(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                WinShell.SetForeground(mainMenu);
-                mainMenu.Show(Cursor.Position);
+                WinShell.SetForeground(mainMenuStrip);
+                mainMenuStrip.Show(Cursor.Position);
             }
         }
     }

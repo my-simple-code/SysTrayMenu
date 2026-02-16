@@ -1,11 +1,15 @@
-﻿namespace SysTrayMenu
+﻿using System.Linq;
+
+namespace SysTrayMenu
 {
     internal class DirectoryItem
     {
+        private List<string> hiddenExtensions = [".lnk", ".url"];
         private  DirectoryItem(string path, bool isFile)
         {
+            var fileInfo = new FileInfo(path);
             Path = path;
-            Name = isFile && (path.ToLower().EndsWith(".lnk") || path.ToLower().EndsWith(".url")) ? System.IO.Path.GetFileNameWithoutExtension(path) : new FileInfo(path).Name;
+            Name = isFile && hiddenExtensions.Contains(fileInfo.Extension) ? System.IO.Path.GetFileNameWithoutExtension(path) : fileInfo.Name;
             IsFile = isFile;
         }
         internal string Path { get; private set; }
@@ -14,6 +18,7 @@
         internal static DirectoryItem Folder(string path) { return new DirectoryItem(path, false);  }
         internal static DirectoryItem File(string path) { return new DirectoryItem(path, true); }
     }
+
     internal static class DirectoryReader
     {
         internal static IList<DirectoryItem> GetDirectoryItems(string path)

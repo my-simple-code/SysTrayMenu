@@ -6,17 +6,11 @@ namespace SysTrayMenu
 {
     public static class WinShell
     {
-        private static Icon? folderIcon;
         private static Image? folderImage;
-
-        public static Icon FolderIcon
-        {
-            get { return folderIcon != null ? folderIcon : folderIcon = System.Drawing.SystemIcons.GetStockIcon(StockIconId.Folder); }
-        }
 
         public static Image FolderImage
         {
-            get { return folderImage != null ? folderImage : folderImage = FolderIcon.ToBitmap(); }
+            get { return folderImage != null ? folderImage : folderImage = SystemIcons.GetStockIcon(StockIconId.Folder).ToBitmap(); }
         }
 
         public static string DesktopFolder
@@ -29,7 +23,7 @@ namespace SysTrayMenu
             SetForegroundWindow(new HandleRef(control, control.Handle));
         }
 
-        public static void ViewInExplorer(string path)
+        public static void OpenInExplorer(string path)
         {
             if (path != null)
             {
