@@ -18,7 +18,7 @@
         {
             if (menu != null)
             {
-                DirectoryItem? fileItem = menu.Tag as DirectoryItem;
+                var fileItem = menu.Tag as DirectoryItem;
                 if (fileItem != null)
                 {
                     menu.Items.Clear();
@@ -45,7 +45,7 @@
             return menuItem;
         }
 
-        internal static void SetForegroundTopParent(Control? control)
+        internal static void SetForegroundTopControl(Control? control)
         {
             if (control != null)
             {
@@ -59,8 +59,7 @@
 
         internal static void Opening(object? sender, System.ComponentModel.CancelEventArgs e)
         {
-            ToolStripDropDownMenu? menu = sender as ToolStripDropDownMenu;
-            SetMenuItems(menu);
+            SetMenuItems(sender as ToolStripDropDownMenu);
         }
 
         internal static void Closing(object? sender, ToolStripDropDownClosingEventArgs e)
@@ -68,13 +67,13 @@
             if ((Control.ModifierKeys & Keys.Control) != 0)
             {
                 e.Cancel = true;
-                SetForegroundTopParent(sender as Control);
+                SetForegroundTopControl(sender as Control);
             }
         }
 
         private static void MouseHover(object? sender, EventArgs e)
         {
-            SetForegroundTopParent(sender as Control);
+            SetForegroundTopControl(sender as Control);
         }
 
         internal static void MenuItem_MouseDown(object? sender, MouseEventArgs e)

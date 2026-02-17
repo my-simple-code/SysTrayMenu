@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace SysTrayMenu
+﻿namespace SysTrayMenu
 {
     internal class DirectoryItem
     {
